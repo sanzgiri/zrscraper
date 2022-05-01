@@ -40,3 +40,6 @@ clicking "Run workflow" under Actions > scrape on GitHub.
 ## Advanced/manual usage
 
 See [real-estate-scrape](https://github.com/mikepqr/real-estate-scrape).
+
+## Todo:
+* Add values from realtor.com & Chase home value estimator
