@@ -15,15 +15,15 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
-    - name: Install real-estate-scrape
+    - name: Install dependencies
       run: |
-        pip install real-estate-scrape
+        pip install lxml matplotlib pandas requests
     - name: Run scraper
       env:
         REDFIN_URL: ${{ secrets.REDFIN_URL }}
         ZILLOW_URL: ${{ secrets.ZILLOW_URL }}
         SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
-      run: real-estate-scrape
+      run: python scrape_with_premium.py
     - name: Commit and push if it changed
       run: |-
         git config --global user.name "scraper-bot"
@@ -33,5 +33,11 @@ jobs:
         git commit -m "Scraped at ${timestamp}" || exit 0
         git push
     - name: Set workflow status
-      # success if NaN is not present in last line of data.csv
-      run: tail -1 data.csv | grep -q -v NaN
+      # Fail with clear error if NaN is present in last line of data.csv
+      run: |
+        if tail -1 data.csv | grep -q NaN; then
+          echo "ERROR: NaN detected in last line of data.csv. Scraper may have failed or returned incomplete data."
+          exit 1
+        else
+          echo "Scrape successful: No NaN detected in last line of data.csv."
+        fi
